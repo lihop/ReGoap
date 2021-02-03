@@ -29,7 +29,31 @@ namespace ReGoap.Utilities
                 }
             }
         }
-#else 
+#elif GODOT
+        private class GodotTraceListener : IListener
+        {
+            public void Write(string message)
+            {
+                Write(message, "");
+            }
+
+            public void Write(string message, string category)
+            {
+                switch (category)
+                {
+                    case "error":
+                        global::Godot.GD.PushError(message);
+                        break;
+                    case "warning":
+                        global::Godot.GD.PushWarning(message);
+                        break;
+                    default:
+                        global::Godot.GD.Print(message);
+                        break;
+                }
+            }
+        }
+#else
     private class GenericTraceListener : IListener
     {
         public void Write(string message)
@@ -62,8 +86,10 @@ namespace ReGoap.Utilities
 
 #if UNITY_5_3_OR_NEWER
             listener = new UnityTraceListener();
+#elif GODOT
+            listener = new GodotTraceListener();
 #else
-        listener = new GenericTraceListener();
+            listener = new GenericTraceListener();
 #endif
         }
 
