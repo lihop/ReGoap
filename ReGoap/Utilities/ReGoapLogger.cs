@@ -43,9 +43,11 @@ namespace ReGoap.Utilities
                 {
                     case "error":
                         global::Godot.GD.PushError(message);
+                        global::Godot.GD.PrintErr(message);
                         break;
                     case "warning":
                         global::Godot.GD.PushWarning(message);
+                        global::Godot.GD.Print(message);
                         break;
                     default:
                         global::Godot.GD.Print(message);
