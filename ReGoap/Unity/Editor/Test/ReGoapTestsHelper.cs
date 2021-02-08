@@ -41,7 +41,7 @@ namespace ReGoap.Unity.Editor.Test
             return customGoal;
         }
 
-        public static void ApplyAndValidatePlan(IReGoapGoal<string, object> plan, ReGoapTestAgent agent,  ReGoapTestMemory memory)
+        public static void ApplyAndValidatePlan(IReGoapGoal<string, object> plan, ReGoapTestAgent agent, ReGoapTestMemory memory)
         {
             GoapActionStackData<string, object> stackData;
             stackData.agent = agent;
@@ -49,7 +49,7 @@ namespace ReGoap.Unity.Editor.Test
             stackData.goalState = plan.GetGoalState();
             stackData.next = null;
             stackData.settings = null;
-            foreach (var action in plan.GetPlan())
+            foreach (var action in plan.Plan)
             {
                 stackData.settings = action.Settings;
                 Assert.That(action.Action.GetPreconditions(stackData).MissingDifference(stackData.currentState, 1) == 0);

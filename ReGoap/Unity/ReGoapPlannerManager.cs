@@ -51,7 +51,7 @@ namespace ReGoap.Unity
         }
     }
 
-// behaviour that should be added once (and only once) to a gameobject in your unity's scene
+    // behaviour that should be added once (and only once) to a gameobject in your unity's scene
     public class ReGoapPlannerManager<T, W> : MonoBehaviour
     {
         public static ReGoapPlannerManager<T, W> Instance;
@@ -164,7 +164,7 @@ namespace ReGoap.Unity
             {
                 ReGoapLogger.Log("[GoapPlannerManager] Done calculating plan, actions list:");
                 var i = 0;
-                foreach (var action in work.NewGoal.GetPlan())
+                foreach (var action in work.NewGoal.Plan)
                 {
                     ReGoapLogger.Log(string.Format("{0}: {1}", i++, action.Action));
                 }

@@ -50,8 +50,9 @@ namespace ReGoap.Godot
 
 			// Add ThreadPool from GODOThreadPool plugin.
 			var ThreadPool = (GDScript)GD.Load("res://addons/thread_pool/thread_pool.gd");
-			threadPool = (Node)(global::Godot.Object)ThreadPool.New();
+			threadPool = (Node)ThreadPool.New();
 			threadPool.Name = "ThreadPool";
+			threadPool.Set("discard_finished_tasks", true);
 			threadPool.Connect("task_discarded", this, "OnTaskCompleted");
 			AddChild(threadPool);
 
@@ -64,7 +65,7 @@ namespace ReGoap.Godot
 
 		public void OnTaskCompleted(object task)
 		{
-			if (task is Reference t && t.Get("target_instance") is global::Godot.Object ti)
+			if (task is Reference t && t.Get("target_instance") is global::Godot.Reference ti)
 			{
 				var instanceId = ti.GetInstanceId();
 				var plannerTask = tasks[instanceId];
@@ -82,9 +83,18 @@ namespace ReGoap.Godot
 					}
 				}
 
-				work.Callback(work.NewGoal);
-
-				tasks.Remove(instanceId);
+				try
+				{
+					work.Callback(work.NewGoal);
+				}
+				catch (Exception ex)
+				{
+					GD.PushError($"Work callback failed: {ex.Message}");
+				}
+				finally
+				{
+					tasks.Remove(instanceId);
+				}
 			}
 		}
 
@@ -106,9 +116,6 @@ namespace ReGoap.Godot
 			return work;
 		}
 
-
-
-
 		public class PlannerTask : Reference
 		{
 			public TaskResult Result { get; private set; }
@@ -125,8 +132,15 @@ namespace ReGoap.Godot
 
 			public void Run()
 			{
-				planner.Plan(_work.Agent, _work.BlacklistGoal, _work.Actions, (newGoal) => OnDone(this, _work, newGoal));
-				signal.WaitOne();
+				try
+				{
+					planner.Plan(_work.Agent, _work.BlacklistGoal, _work.Actions, (newGoal) => OnDone(this, _work, newGoal));
+					signal.WaitOne();
+				}
+				catch (ObjectDisposedException)
+				{
+					ReGoapLogger.LogWarning("Objects disposed before planning completed.");
+				}
 			}
 
 			public void OnDone(PlannerTask task, ReGoapPlanWork<T, W> work, IReGoapGoal<T, W> newGoal)

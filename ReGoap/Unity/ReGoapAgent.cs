@@ -117,7 +117,7 @@ namespace ReGoap.Unity
             //var watch = System.Diagnostics.Stopwatch.StartNew();
             startedPlanning = true;
             currentReGoapPlanWorker = ReGoapPlannerManager<T, W>.Instance.Plan(this, BlackListGoalOnFailure ? currentGoal : null,
-                currentGoal != null ? currentGoal.GetPlan() : null, OnDonePlanning);
+                currentGoal != null ? currentGoal.Plan : null, OnDonePlanning);
 
             return true;
         }
@@ -126,7 +126,8 @@ namespace ReGoap.Unity
         {
             startedPlanning = false;
             currentReGoapPlanWorker = default(ReGoapPlanWork<T, W>);
-            if (newGoal == null) { 
+            if (newGoal == null)
+            {
                 if (currentGoal == null)
                 {
                     ReGoapLogger.LogWarning("GoapAgent " + this + " could not find a plan.");
@@ -145,7 +146,7 @@ namespace ReGoap.Unity
                     startingPlan[i].Action.PlanExit(i > 0 ? startingPlan[i - 1].Action : null, i + 1 < startingPlan.Count ? startingPlan[i + 1].Action : null, startingPlan[i].Settings, currentGoal.GetGoalState());
                 }
             }
-            startingPlan = currentGoal.GetPlan().ToList();
+            startingPlan = currentGoal.Plan.ToList();
             ClearPlanValues();
             for (int i = 0; i < startingPlan.Count; i++)
             {
@@ -182,7 +183,7 @@ namespace ReGoap.Unity
                 CalculateNewGoal();
                 return;
             }
-            var plan = currentGoal.GetPlan();
+            var plan = currentGoal.Plan;
             if (plan.Count == 0)
             {
                 if (currentActionState != null)

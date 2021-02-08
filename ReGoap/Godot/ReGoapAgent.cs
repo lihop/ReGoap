@@ -46,7 +46,7 @@ namespace ReGoap.Godot
 
 		protected float lastCalculationTime;
 
-		public IReGoapMemory<T, W> Memory { get; protected set; } = new ReGoapMemory<T, W>();
+		public IReGoapMemory<T, W> Memory { get; protected set; }
 
 		protected ReGoapActionState<T, W> currentActionState;
 
@@ -277,6 +277,13 @@ namespace ReGoap.Godot
 				if (child is IReGoapGoal<T, W> goal)
 					goals.Add(goal);
 			}
+
+			Action<Node, Action<Node>> preorderTraverse = null;
+			preorderTraverse = (node, action) =>
+			{
+				action(node);
+				foreach (var child in node.GetChildren()) preorderTraverse(node, action);
+			};
 		}
 
 		public virtual void RefreshActionsSet()
@@ -293,5 +300,63 @@ namespace ReGoap.Godot
 
 	public class ReGoapAgent : ReGoapAgent<object, object>
 	{
+		[Signal]
+		public delegate void PlanningCompleted();
+
+		[Signal]
+		public delegate void GoalChanged(ReGoapGoal newGoal);
+
+		[Signal]
+		public delegate void PlanChanged(List<ReGoapAction> newPlan);
+
+		protected override void OnDonePlanning(IReGoapGoal<object, object> newGoal)
+		{
+			List<ReGoapAction> newPlan = null;
+
+			if (newGoal != null)
+				newPlan = newGoal.Plan.Select(action => (ReGoapAction)action.Action).ToList<ReGoapAction>();
+
+			var prevGoalHash = GD.Hash(null);
+			var prevPlanHash = GD.Hash(null);
+
+			if (CurrentGoal != null)
+			{
+				prevGoalHash = GD.Hash(CurrentGoal);
+
+				if (CurrentGoal.Plan != null)
+					prevPlanHash = CurrentGoal.Plan.GetHashCode();
+			}
+
+			base.OnDonePlanning(newGoal);
+
+			var curGoalHash = GD.Hash(null);
+			var curPlanHash = GD.Hash(null);
+
+			if (CurrentGoal != null)
+			{
+				curGoalHash = GD.Hash(CurrentGoal);
+
+				if (CurrentGoal.Plan != null)
+					curPlanHash = CurrentGoal.Plan.GetHashCode();
+			}
+
+			if (prevGoalHash != curGoalHash)
+			{
+				if (CurrentGoal != null)
+					EmitSignal(nameof(GoalChanged), CurrentGoal);
+				else
+					EmitSignal(nameof(GoalChanged), null);
+			}
+
+			if (prevPlanHash != curPlanHash)
+			{
+				if (CurrentGoal != null && CurrentGoal.Plan != null)
+					EmitSignal(nameof(PlanChanged), newPlan);
+				else
+					EmitSignal(nameof(PlanChanged), null);
+			}
+
+			EmitSignal(nameof(PlanningCompleted));
+		}
 	}
 }
