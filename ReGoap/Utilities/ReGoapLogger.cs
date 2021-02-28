@@ -73,9 +73,9 @@ namespace ReGoap.Utilities
         [Flags]
         public enum DebugLevel
         {
-            None, ErrorsOnly, WarningsOnly, Full
+            Off, Fatal, Error, Warn, Info, Debug, Trace,
         }
-        public static DebugLevel Level = DebugLevel.Full;
+        public static DebugLevel Level = DebugLevel.Info;
         public static bool RunOnlyOnMainThread = true;
 
         private static readonly IListener listener;
@@ -100,21 +100,36 @@ namespace ReGoap.Utilities
             return !RunOnlyOnMainThread || System.Threading.Thread.CurrentThread.ManagedThreadId == mainThreadId;
         }
 
-        public static void Log(string message)
+        public static void LogTrace(string message)
         {
-            if (Level != DebugLevel.Full || !InMainThread()) return;
-            listener.Write(message);
+            if (Level < DebugLevel.Trace || !InMainThread()) return;
+            listener.Write(message, "trace");
+        }
+
+        public static void LogDebug(string message)
+        {
+            if (Level < DebugLevel.Debug || !InMainThread()) return;
+            listener.Write(message, "debug");
+        }
+
+        [Obsolete("Log is deprecated. Use the LogInfo method instead.")]
+        public static void Log(string message) => LogInfo(message);
+
+        public static void LogInfo(string message)
+        {
+            if (Level < DebugLevel.Info || !InMainThread()) return;
+            listener.Write(message, "info");
         }
 
         public static void LogWarning(string message)
         {
-            if (Level < DebugLevel.WarningsOnly || !InMainThread()) return;
+            if (Level < DebugLevel.Warn || !InMainThread()) return;
             listener.Write(message, "warning");
         }
 
         public static void LogError(string message)
         {
-            if (Level < DebugLevel.ErrorsOnly || !InMainThread()) return;
+            if (Level < DebugLevel.Error || !InMainThread()) return;
             listener.Write(message, "error");
         }
     }

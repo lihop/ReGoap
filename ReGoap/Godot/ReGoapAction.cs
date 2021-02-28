@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using ReGoap.Core;
@@ -8,7 +9,7 @@ namespace ReGoap.Godot
 	public class ReGoapAction<T, W> : Node, IReGoapAction<T, W>
 	{
 		[Export]
-		public float Cost { get; protected set; }
+		public float Cost { get; protected set; } = 1;
 
 		[Export]
 		public Dictionary Effect { get; set; } = new Dictionary();
@@ -26,12 +27,21 @@ namespace ReGoap.Godot
 
 		public bool Active { get => IsProcessing() || IsPhysicsProcessing(); }
 
+		protected Action<IReGoapAction<T, W>> doneCallback;
+		protected Action<IReGoapAction<T, W>> failCallback;
+		protected IReGoapAction<T, W> previousAction;
+		protected IReGoapAction<T, W> nextAction;
+
+		protected ReGoapState<T, W> settings = null;
+
 		#region GodotFunctions
 
 		public override void _Ready()
 		{
 			SetProcess(false);
 			SetPhysicsProcess(false);
+
+			settings = ReGoapState<T, W>.Instantiate();
 		}
 
 		#endregion
@@ -45,8 +55,24 @@ namespace ReGoap.Godot
 			}
 		}
 
-		public void Run(IReGoapAction<T, W> previousAction, IReGoapAction<T, W> nextAction, ReGoapState<T, W> settings, ReGoapState<T, W> goalState, Action<IReGoapAction<T, W>> done, Action<IReGoapAction<T, W>> fail)
+		public virtual List<ReGoapState<T, W>> GetSettings(GoapActionStackData<T, W> stackData) => new List<ReGoapState<T, W>> { settings };
+
+		public virtual float GetCost(GoapActionStackData<T, W> stackData) => Cost;
+
+		public virtual void Run(IReGoapAction<T, W> previous, IReGoapAction<T, W> next, ReGoapState<T, W> settings,
+			ReGoapState<T, W> goalState, Action<IReGoapAction<T, W>> done, Action<IReGoapAction<T, W>> fail)
 		{
+			InterruptWhenPossible = false;
+			this.settings = settings;
+
+			doneCallback = done;
+			failCallback = fail;
+
+			previousAction = previous;
+			nextAction = next;
+
+			SetProcess(true);
+			SetPhysicsProcess(true);
 		}
 
 		public override string ToString() => $"GoapAction('{Name}')";
@@ -69,4 +95,5 @@ namespace ReGoap.Godot
 			}
 		}
 	}
+
 }

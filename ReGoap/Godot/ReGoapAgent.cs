@@ -310,6 +310,18 @@ namespace ReGoap.Godot
         [Signal]
         public delegate void PlanChanged(List<ReGoapAction> newPlan);
 
+        #region GodotFunctions
+
+        public override void _Process(float delta)
+        {
+            possibleGoalsDirty = true;
+
+            if (currentActionState == null && !IsPlanning)
+                CalculateNewGoal();
+        }
+
+        #endregion
+
         protected override void OnDonePlanning(IReGoapGoal<object, object> newGoal)
         {
             List<ReGoapAction> newPlan = null;

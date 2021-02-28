@@ -21,7 +21,7 @@ namespace ReGoap.Planner
 
 		public IReGoapGoal<T, W> Plan(IReGoapAgent<T, W> agent, IReGoapGoal<T, W> blacklistGoal = null, Queue<ReGoapActionState<T, W>> currentPlan = null, Action<IReGoapGoal<T, W>> callback = null)
 		{
-			if (ReGoapLogger.Level == ReGoapLogger.DebugLevel.Full)
+			if (ReGoapLogger.Level == ReGoapLogger.DebugLevel.Info)
 				ReGoapLogger.Log("[ReGoalPlanner] Starting planning calculation for agent: " + agent);
 			goapAgent = agent;
 			Calculated = false;
@@ -110,7 +110,7 @@ namespace ReGoap.Planner
 			if (currentGoal != null)
 			{
 				ReGoapLogger.Log(string.Format("[ReGoapPlanner] Calculated plan for goal '{0}', plan length: {1}", currentGoal, currentGoal.Plan.Count));
-				if (ReGoapLogger.Level == ReGoapLogger.DebugLevel.Full)
+				if (ReGoapLogger.Level == ReGoapLogger.DebugLevel.Info)
 				{
 					int i = 0;
 					GoapActionStackData<T, W> stackData;

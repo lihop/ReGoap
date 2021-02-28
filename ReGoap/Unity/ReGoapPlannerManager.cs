@@ -67,7 +67,7 @@ namespace ReGoap.Unity
 
         public ReGoapPlannerSettings PlannerSettings;
 
-        public ReGoapLogger.DebugLevel LogLevel = ReGoapLogger.DebugLevel.Full;
+        public ReGoapLogger.DebugLevel LogLevel = ReGoapLogger.DebugLevel.INFO;
 
         public int NodeWarmupCount = 1000;
         public int StatesWarmupCount = 10000;
@@ -160,7 +160,7 @@ namespace ReGoap.Unity
             {
                 doneWorks.Add(work);
             }
-            if (work.NewGoal != null && ReGoapLogger.Level == ReGoapLogger.DebugLevel.Full)
+            if (work.NewGoal != null && ReGoapLogger.Level == ReGoapLogger.DebugLevel.INFO)
             {
                 ReGoapLogger.Log("[GoapPlannerManager] Done calculating plan, actions list:");
                 var i = 0;

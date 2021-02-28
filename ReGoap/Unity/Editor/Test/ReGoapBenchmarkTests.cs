@@ -19,7 +19,7 @@ namespace ReGoap.Unity.Editor.Test
             func();
 
             var watch = new Stopwatch();
-            ReGoapLogger.Level = ReGoapLogger.DebugLevel.None;
+            ReGoapLogger.Level = ReGoapLogger.DebugLevel.OFF;
 
             // clean up
             GC.Collect();
@@ -36,7 +36,7 @@ namespace ReGoap.Unity.Editor.Test
             // clean up
             GC.Collect();
 
-            ReGoapLogger.Level = ReGoapLogger.DebugLevel.Full;
+            ReGoapLogger.Level = ReGoapLogger.DebugLevel.INFO;
 
             ReGoapLogger.Log(string.Format("[Profile] {0} took {1}ms (iters: {2} ; avg: {3}ms).", description, watch.Elapsed.TotalMilliseconds, iterations, watch.Elapsed.TotalMilliseconds / iterations));
             return watch.Elapsed.TotalMilliseconds;

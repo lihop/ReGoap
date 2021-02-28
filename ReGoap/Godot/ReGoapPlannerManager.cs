@@ -11,7 +11,7 @@ namespace ReGoap.Godot
 	public class ReGoapPlannerManager<T, W> : Node
 	{
 		[Export]
-		public ReGoapLogger.DebugLevel LogLevel { get; set; } = ReGoapLogger.DebugLevel.Full;
+		public ReGoapLogger.DebugLevel LogLevel { get; set; } = ReGoapLogger.DebugLevel.Info;
 
 		[Export]
 		public int NodeWarmupCount { get; set; } = 1000;
@@ -65,7 +65,7 @@ namespace ReGoap.Godot
 				{
 					work.NewGoal = newGoal;
 
-					if (work.NewGoal != null && ReGoapLogger.Level == ReGoapLogger.DebugLevel.Full)
+					if (work.NewGoal != null && ReGoapLogger.Level == ReGoapLogger.DebugLevel.Info)
 					{
 						ReGoapLogger.Log("[GoapPlannerManager] Done calculating plan, actions list:");
 						foreach (var item in work.NewGoal.Plan.Select((action, i) => new { i, action }))
